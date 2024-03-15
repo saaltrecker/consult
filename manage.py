@@ -1,12 +1,15 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-import os
 import sys
+
+import environ
+
+environ.Env.read_env(".env", overwrite=False)
+env = environ.Env()
+env("DJANGO_SETTINGS_MODULE")  # will raise if this is undefined
 
 
 def main():
-    """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "consultation_analyser.settings.base")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
