@@ -42,6 +42,12 @@ Only run this in development. Will create a consultation with 10 complete respon
 make dummy_data
 ```
 
+### Database schema
+
+Regenerate this diagram after running `migrate` by invoking `manage.py generate_erd`. (You will need `graphviz` installed: see [`pydot` docs](https://pypi.org/project/pydot/)).
+
+![](docs/erd.png)
+
 ### Frontend
 
 
