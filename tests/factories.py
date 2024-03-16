@@ -35,6 +35,7 @@ class FakeConsultationData:
 class QuestionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Question
+        skip_postgeneration_save = True
 
     text = factory.LazyAttribute(lambda o: o.question["text"])
     slug = factory.LazyAttribute(lambda o: o.question["slug"])
@@ -44,21 +45,43 @@ class QuestionFactory(factory.django.DjangoModelFactory):
     class Params:
         question = FakeConsultationData().question()
 
+    @factory.post_generation
+    def with_answer(question, creation_strategy, value, **kwargs):
+        if value is True:
+            AnswerFactory(question=question)
+
 
 class SectionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Section
+        skip_postgeneration_save = True
 
     name = faker.sentence()
     slug = faker.slug()
+
+    class Params:
+        with_questions = factory.Trait(questions=[factory.SubFactory(QuestionFactory)])
+
+    @factory.post_generation
+    def with_question(section, creation_strategy, value, **kwargs):
+        if value is True:
+            QuestionFactory(section=section, with_answer=kwargs.get("with_answer"))
 
 
 class ConsultationFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Consultation
+        skip_postgeneration_save = True
 
     name = faker.sentence()
     slug = faker.slug()
+
+    @factory.post_generation
+    def with_question(consultation, creation_strategy, value, **kwargs):
+        if value is True:
+            SectionFactory(
+                consultation=consultation, with_question=True, with_question__with_answer=kwargs.get("with_answer")
+            )
 
 
 class ConsultationResponseFactory(factory.django.DjangoModelFactory):
@@ -81,3 +104,4 @@ class AnswerFactory(factory.django.DjangoModelFactory):
     )
 
     question = factory.SubFactory(QuestionFactory)
+    consultation_response = factory.SubFactory(ConsultationResponseFactory)
