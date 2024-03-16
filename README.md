@@ -4,7 +4,10 @@ This project is currently at prototyping stage.
 
 The Consultation Analyser is an AI-powered tool to automate the processing of public consultations.
 
+
 ## Setting up the application
+
+Application and worker processes are started by `honcho`: `pip install honcho`.
 
 Populate `.env` by copying `.env.example` and filling in required values.
 

@@ -35,7 +35,7 @@ migrate: ## Apply migrations
 
 .PHONY: serve
 serve: ## Run the server
-	poetry run python manage.py runserver
+	honcho start
 
 .PHONY: test
 test: ## Run the tests
