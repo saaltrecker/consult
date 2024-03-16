@@ -54,8 +54,11 @@ you can run `manage.py generate_erd`. (You will need `graphviz` installed: see
 
 ![](docs/erd.png)
 
-### Frontend
+### Celery and async tasks
 
+By default, in local development celery will talk to redis. You'll need redis running to support this, which is just `brew install redis`.
+
+### Frontend
 
 #### CSS
 
