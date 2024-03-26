@@ -71,15 +71,15 @@ docker_build: ## Build the docker container
 
 .PHONY: docker_run
 docker_run: ## Run the docker container
-	docker run -e DATABASE_URL=psql://consultations_dev:@host.docker.internal:5432/consultations_dev -p 8000:8000 $(IMAGE)
+	docker run --rm -e DATABASE_URL=psql://consultations_dev:@host.docker.internal:5432/consultations_dev -p 8000:8000 $(IMAGE)
 
 .PHONY: docker_shell
 docker_shell: ## Run the docker container
-	docker run -e DATABASE_URL=psql://consultations_dev:@host.docker.internal:5432/consultations_dev -it $(IMAGE) /bin/bash
+	docker run --rm -e DATABASE_URL=psql://consultations_dev:@host.docker.internal:5432/consultations_dev -it $(IMAGE) /bin/bash
 
 .PHONY: docker_test
 docker_test: ## Run the tests in the docker container
-	docker run -e DATABASE_URL=psql://consultations_test:@host.docker.internal:5432/consultations_test $(IMAGE) ./venv/bin/pytest
+	docker run --rm -e DATABASE_URL=psql://consultations_test:@host.docker.internal:5432/consultations_test $(IMAGE) ./venv/bin/pytest
 
 .PHONY: docker_login
 docker_login:
