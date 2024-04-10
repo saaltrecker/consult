@@ -10,15 +10,15 @@
       <h1 class="govuk-heading-l">{{ page_title }}</h1>
       <p class="govuk-body">{{ question.text }}</p>
 
-      {% if multiple_choice and total_responses %}
+      {% if multiple_choice %}
         <dl class="govuk-summary-list">
-          {% for item in multiple_choice %}
+          {% for response in question.multiple_choice_response_counts().values() %}
             <div class="govuk-summary-list__row">
               <dt class="govuk-summary-list__key">
-                {{ item.label }}
+                {{ response.answer }}
               </dt>
               <dd class="govuk-summary-list__value">
-                {{ ((item.count / total_responses) * 100)|round|int }}%
+                {{ response.percent }}%
               </dd>
             </div>
           {% endfor %}
