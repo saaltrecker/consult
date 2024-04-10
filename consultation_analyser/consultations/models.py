@@ -1,4 +1,7 @@
 import uuid
+from collections import Counter
+from dataclasses import dataclass
+from functools import reduce
 
 from django.db import models
 
@@ -38,12 +41,35 @@ class Section(UUIDPrimaryKeyModel, TimeStampedModel):
         ]
 
 
+@dataclass
+class MultipleChoiceResponseCount:
+    answer: str
+    count: int
+    percent: float
+
+
 class Question(UUIDPrimaryKeyModel, TimeStampedModel):
     text = models.CharField(null=False, max_length=None)  # no idea what's a sensible value for max_length
     slug = models.CharField(null=False, max_length=256)
     has_free_text = models.BooleanField(default=False)
     multiple_choice_options = models.JSONField(null=True)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
+
+    def multiple_choice_response_counts(self):
+        if not self.multiple_choice_options:
+            return None
+
+        responses = reduce(lambda resps, answer: resps + answer.multiple_choice_responses, self.answer_set.all(), [])
+        counter = Counter(responses)
+
+        # this does not support more than one choice per response
+        total_response_count = len(responses)
+        response_counts = {}
+        for answer, count in counter.items():
+            percent = round((count / total_response_count) * 100)
+            response_counts[answer] = MultipleChoiceResponseCount(answer=answer, count=count, percent=percent)
+
+        return response_counts
 
     class Meta(UUIDPrimaryKeyModel.Meta, TimeStampedModel.Meta):
         constraints = [
