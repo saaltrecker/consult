@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "consultation_analyser.authentication",
     "consultation_analyser.consultations",
     "compressor",
+    "magic_link",
 ]
 
 
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -60,7 +62,10 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.jinja2.Jinja2",
         "APP_DIRS": True,
-        "OPTIONS": {"environment": "consultation_analyser.jinja2.environment"},
+        "OPTIONS": {
+            "environment": "consultation_analyser.jinja2.environment",
+            "context_processors": ["consultation_analyser.consultations.context_processors.menu_items"],
+        },
     },
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
