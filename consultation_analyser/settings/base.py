@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django.contrib.auth",
+    "django.contrib.admin",
     "consultation_analyser.authentication",
     "consultation_analyser.consultations",
     "compressor",
@@ -65,6 +66,13 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.request"
+            ]
+        }
     },
 ]
 
@@ -134,6 +142,7 @@ STATICFILES_DIRS = [("govuk-assets", BASE_DIR / "node_modules/govuk-frontend/dis
 STATICFILES_FINDERS = [
     "compressor.finders.CompressorFinder",
     "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
 # Default primary key field type
