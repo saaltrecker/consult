@@ -58,9 +58,8 @@ serve: ## Run the server
 	poetry run gunicorn --reload --workers=1 -c consultation_analyser/gunicorn.py consultation_analyser.wsgi
 
 .PHONY: test
-test: ## Run the tests and linters
-	poetry run pytest tests/
-	poetry run pre-commit run --all-files
+test: ## Run the tests
+	poetry run pytest
 
 .PHONY: govuk_frontend
 govuk_frontend: ## Pull govuk-frontend
