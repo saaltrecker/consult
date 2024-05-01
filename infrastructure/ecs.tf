@@ -17,7 +17,6 @@ module "ecs" {
     path                = "/"
     timeout             = 6
     port                = 8000
-
   }
   environment_variables = {
     "ENVIRONMENT"                          = terraform.workspace,
