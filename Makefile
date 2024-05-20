@@ -19,8 +19,11 @@ consultation_analyser/consultations/public_schema/%_schema.json: consultation_an
 consultation_analyser/consultations/public_schema/%_example.json: consultation_analyser/consultations/public_schema/%_schema.json
 	npx generate-json $^ $@ none $(PWD)/json-schema-faker-options.js
 
-.PHONY: schema_docs
-schema_docs: consultation_analyser/consultations/public_schema/consultation_example.json consultation_analyser/consultations/public_schema/consultation_response_example.json consultation_analyser/consultations/public_schema/consultation_with_responses_example.json ## Generate examples and JSON schemas for the documentation
+.PHONY: schema_docs ## Generate examples and JSON schemas for the documentation
+schema_docs: consultation_analyser/consultations/public_schema/consultation_example.json \
+	consultation_analyser/consultations/public_schema/consultation_response_example.json \
+	consultation_analyser/consultations/public_schema/consultation_with_responses_example.json \
+	consultation_analyser/consultations/public_schema/consultation_with_responses_and_themes_example.json
 
 .PHONY: setup_dev_db
 setup_dev_db: ## Set up the development db on a local postgres

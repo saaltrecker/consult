@@ -166,4 +166,59 @@ components:
           description: The responses
           items:
             $ref: '#/components/schemas/ConsultationResponse'
+    ConsultationWithResponsesAndThemes:
+      type: object
+      description: A Consultation and its ConsultationResponses, plus Themes assigned by the tool
+      required:
+        - consultation
+        - consultation_responses
+        - themes
+      additionalProperties: false
+      properties:
+        consultation:
+          type: object
+          description: The consultation
+          $ref: '#/components/schemas/Consultation'
+        consultation_responses:
+          type: array
+          minItems: 1
+          description: The responses
+          items:
+            $ref: '#/components/schemas/ConsultationResponse'
+        themes:
+          type: array
+          minItems: 1
+          description: The themes
+          items:
+            $ref: '#/components/schemas/Theme'
+    Theme:
+      type: object
+      description: A theme, assigned either by people or AI
+      required:
+        - question_id
+        - theme_id
+        - answer_count
+        - keywords
+        - summary
+      additionalProperties: false
+      properties:
+        question_id:
+          type: string
+          format: uuid
+        question_id:
+          type: string
+          format: uuid
+        answer_count:
+          type: integer
+          description: How many answers are in this theme
+          minimum: 0
+        keywords:
+          type: array
+          description: The keywords in the theme
+          items:
+            type: string
+        summary:
+          type: string
+          description: A free-text summary of the theme
+
 

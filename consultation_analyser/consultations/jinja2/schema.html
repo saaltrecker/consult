@@ -91,6 +91,32 @@
     </div>
   </details>
 
+  <h3 class="govuk-heading-m">ConsultationAndResponsesWithThemes JSON</h3>
+  <p class="govuk-body">The schema for a download including the consultation itself, plus its themes.</p>
+
+  <details class="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">
+        JSON schema
+      </span>
+    </summary>
+    <div class="govuk-details__text" data-qa="consultation-response-schema">
+      <p class="govuk-body"><a class="govuk-link" download href="/schema/consultation_with_responses_and_themes_schema.json">Download the JSON schema</a></p>
+      <pre><code>{{ json_schemas['consultation_with_responses_and_themes'] }}</code></pre>
+    </div>
+  </details>
+
+  <details class="govuk-details">
+    <summary class="govuk-details__summary">
+      <span class="govuk-details__summary-text">
+        Example JSON
+      </span>
+    </summary>
+    <div class="govuk-details__text" data-qa="consultation-response-example">
+      <pre><code>{{ json_examples['consultation_with_responses_and_themes'] }}</code></pre>
+    </div>
+  </details>
+
 
   <h2 class="govuk-heading-l">Entities</h2>
   {% for schema in entity_schemas %}

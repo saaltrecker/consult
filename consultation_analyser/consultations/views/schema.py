@@ -20,6 +20,7 @@ def raw_schema(request: HttpRequest, schema_name: str):
         "consultation_schema": f"{SCHEMA_DIR}/consultation_schema.json",
         "consultation_response_schema": f"{SCHEMA_DIR}/consultation_response_schema.json",
         "consultation_with_responses_schema": f"{SCHEMA_DIR}/consultation_with_responses_schema.json",
+        "consultation_with_responses_and_themes_schema": f"{SCHEMA_DIR}/consultation_with_responses_and_themes_schema.json",
     }
 
     # this is here so we don't use untrusted input to traverse the filesystem
@@ -36,6 +37,9 @@ def show(request: HttpRequest):
         "consultation_with_responses": pretty_format_json(
             open(f"{SCHEMA_DIR}/consultation_with_responses_schema.json").read()
         ),
+        "consultation_with_responses_and_themes": pretty_format_json(
+            open(f"{SCHEMA_DIR}/consultation_with_responses_and_themes_schema.json").read()
+        ),
     }
 
     json_examples = {
@@ -43,6 +47,9 @@ def show(request: HttpRequest):
         "consultation_response": pretty_format_json(open(f"{SCHEMA_DIR}/consultation_response_example.json").read()),
         "consultation_with_responses": pretty_format_json(
             open(f"{SCHEMA_DIR}/consultation_with_responses_example.json").read()
+        ),
+        "consultation_with_responses_and_themes": pretty_format_json(
+            open(f"{SCHEMA_DIR}/consultation_with_responses_and_themes_example.json").read()
         ),
     }
 
@@ -54,6 +61,7 @@ def show(request: HttpRequest):
         RenderableSchema(public_schema.MultipleChoice),
         RenderableSchema(public_schema.MultipleChoiceItem),
         RenderableSchema(public_schema.ConsultationResponse),
+        RenderableSchema(public_schema.Theme),
     ]
 
     return render(
