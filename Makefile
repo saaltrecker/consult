@@ -4,6 +4,7 @@ export AWS_REGION
 export ECR_REPO_NAME
 export APP_NAME
 
+
 .PHONY: help
 help:     ## Show this help.
 	@egrep -h '\s##\s' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m  %-30s\033[0m %s\n", $$1, $$2}'
@@ -80,6 +81,8 @@ dev_environment: reset_dev_db migrate dummy_data reset_test_db govuk_frontend de
 # Docker
 AWS_REGION=eu-west-2
 APP_NAME=consultations
+DOCKER_CACHE_BUCKET=i-dot-ai-docker-cache
+DOCKER_BUILDER_CONTAINER=container
 ECR_URL=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO_URL=$(ECR_URL)/$(ECR_REPO_NAME)
 
@@ -107,8 +110,9 @@ tf_build_args=-var "image_tag=$(IMAGE_TAG)"
 .PHONY: docker_build
 docker_build: ## Pull previous container (if it exists) build the docker container
 	docker pull $(PREV_IMAGE) || true
-	docker buildx create --name container --driver=docker-container
-	docker buildx build --builder=container -t $(IMAGE) --cache-to type=s3,region=$(AWS_REGION),bucket=i-dot-ai-docker-cache,name=consultation/$(IMAGE) --cache-from type=s3,region=$(AWS_REGION),bucket=i-dot-ai-docker-cache,name=consultation/$(IMAGE) .
+	docker buildx build --load --builder=$(DOCKER_BUILDER_CONTAINER) -t $(IMAGE)  \
+	--cache-to type=s3,region=$(AWS_REGION),bucket=$(DOCKER_CACHE_BUCKET),name=$(APP_NAME)/$(IMAGE) \
+	--cache-from type=s3,region=$(AWS_REGION),bucket=$(DOCKER_CACHE_BUCKET),name=$(APP_NAME)/$(IMAGE) .
 
 .PHONY: docker_run
 docker_run: ## Run the docker container
