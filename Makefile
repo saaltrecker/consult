@@ -107,7 +107,7 @@ tf_build_args=-var "image_tag=$(IMAGE_TAG)"
 .PHONY: docker_build
 docker_build: ## Pull previous container (if it exists) build the docker container
 	docker pull $(PREV_IMAGE) || true
-	docker build . -t $(IMAGE)
+	docker buildx build --push -t $(IMAGE) --cache-to type=s3,region=$(AWS_REGION),bucket=i-dot-ai-docker-cache,name=$(IMAGE) --cache-from type=s3,region=$(AWS_REGION),bucket=i-dot-ai-docker-cache,name=$(IMAGE) .
 
 .PHONY: docker_run
 docker_run: ## Run the docker container
