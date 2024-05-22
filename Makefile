@@ -82,11 +82,11 @@ dev_environment: reset_dev_db migrate dummy_data reset_test_db govuk_frontend de
 AWS_REGION=eu-west-2
 APP_NAME=consultations
 DOCKER_CACHE_BUCKET=i-dot-ai-docker-cache
-DOCKER_BUILDER_CONTAINER=container
+
 ECR_URL=$(AWS_ACCOUNT_ID).dkr.ecr.$(AWS_REGION).amazonaws.com
 ECR_REPO_URL=$(ECR_URL)/$(ECR_REPO_NAME)
-
 ECR_REPO_NAME=$(APP_NAME)
+DOCKER_BUILDER_CONTAINER=$(APP_NAME)
 IMAGE_TAG=$$(git rev-parse HEAD)
 
 AUTO_APPLY_RESOURCES = module.ecs.aws_ecs_task_definition.aws-ecs-task \
