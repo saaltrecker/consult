@@ -142,6 +142,9 @@ components:
         - id
       additionalProperties: false
       properties:
+        id:
+          type: string
+          format: uuid
         submitted_at:
           type: string
           format: date-time
@@ -172,11 +175,14 @@ components:
             $ref: '#/components/schemas/ConsultationResponse'
     ConsultationWithResponsesAndThemes:
       type: object
-      description: A Consultation and its ConsultationResponses, plus Themes assigned by the tool
+      description: |
+        A Consultation and its ConsultationResponses, plus Themes assigned by
+        the tool and metadata about the processing run
       required:
         - consultation
         - consultation_responses
         - themes
+        - processing
       additionalProperties: false
       properties:
         consultation:
@@ -195,6 +201,10 @@ components:
           description: The themes
           items:
             $ref: '#/components/schemas/Theme'
+        processing:
+          type: object
+          description: How this consultation was processed
+          $ref: '#/components/schemas/Processing'
     Theme:
       type: object
       description: A theme, assigned by AI
@@ -239,5 +249,201 @@ components:
               higher
             - Respondents flagged concerns around the conservation of habitats
               in the area and local biodiversity in general
-
+    LLM:
+      type: object
+      required:
+        - prompt_template
+        - language_model
+      additionalProperties: false
+      properties:
+        prompt_template:
+          type: string
+          description: The prompt we used to generate the summaries
+          examples:
+            - |
+              You are serving as an expert AI assisting UK government
+              policy officers in analyzing public opinions on new policies.
+              The topic of the new policy is {consultation_name}...
+        language_model:
+          type: string
+          description: The LLM that generated the summaries
+          examples:
+            - i-dot-ai-model-mistral-7b-instruct-1
+            - ollama/llama3
+            - fake
+    DummyTopicModel:
+      type: object
+    BERTopic:
+      type: object
+      description: Metadata about how BERTopic was configured
+      required:
+        - embedding_model
+        - dimensionality_reduction
+        - clustering
+        - tokenizer
+        - weighting
+      additionalProperties: false
+      properties:
+        embedding_model:
+          type: string
+          description: |
+            The embedding model used to convert inputs to numerical
+            representations, as a huggingface SentenceTransformers identifier
+          examples:
+            - "thenlper/gte-small"
+            - "all-mpnet-base-v2"
+        dimensionality_reduction:
+          type: object
+          required:
+            - algorithm
+            - parameters
+          additionalProperties: false
+          properties:
+            algorithm:
+              type: string
+              enum: ["UMAP"]
+            parameters:
+              type: object
+              oneOf:
+              - $ref: "#/components/schemas/UMAPParameters"
+        clustering:
+          type: object
+          required:
+            - algorithm
+            - parameters
+          properties:
+            algorithm:
+              type: string
+              enum: ["HDBSCAN"]
+            parameters:
+              type: object
+              oneOf:
+              - $ref: "#/components/schemas/HDBSCANParameters"
+        tokenizer:
+          required:
+            - algorithm
+          additionalProperties: false
+          properties:
+            algorithm:
+              type: string
+              description: The name of the tokenizer algorithm
+              examples:
+                - "CountVectorizer"
+        weighting:
+          required:
+            - algorithm
+          additionalProperties: false
+          properties:
+            algorithm:
+              type: string
+              description: The name of the weighting algorithm
+              examples:
+                - "ClassTfidfTransformer"
+    HDBSCANParameters:
+      type: object
+      description: Parameters to configure the HDBSCAN clustering algorithm
+      required:
+        - min_cluster_size
+        - metric
+        - cluster_selection_method
+        - prediction_data
+      additionalProperties: false
+      properties:
+        min_cluster_size:
+          type: integer
+          description: |
+            The minimum size of clusters; single linkage splits that contain
+            fewer points than this will be considered points “falling out” of a
+            cluster
+          examples:
+            - 3
+        metric:
+          type: string
+          description: The metric used to compute distance in the input data
+          examples:
+            - "euclidean"
+        cluster_selection_method:
+          type: string
+          description: The method used to select clusters from the condensed tree.
+          examples:
+            - "eom"
+        prediction_data:
+          type: boolean
+          description: |
+            Whether to generate extra cached data for predicting labels or
+            membership vectors for new unseen points later
+    UMAPParameters:
+      type: object
+      description: Parameters to configure the UMAP dimensionality reduction algorithm
+      required:
+        - n_neighbors
+        - min_dist
+        - n_components
+        - metric
+        - random_state
+      additionalProperties: false
+      properties:
+        n_neighbors:
+          type: integer
+          description: |
+            This parameter controls how UMAP balances local versus global
+            structure in the data. It does this by constraining the size of the
+            local neighborhood UMAP will look at when attempting to learn the
+            manifold structure of the data.
+          examples:
+            - 15
+        min_dist:
+          type: number
+          format: float
+          description: |
+            The min_dist parameter controls how tightly UMAP is allowed to pack
+            points together. It, quite literally, provides the minimum distance
+            apart that points are allowed to be in the low dimensional
+            representation
+          examples:
+            - 0.0
+        n_components:
+          type: integer
+          description: The dimensionality to reduce to
+          examples:
+            - 5
+        metric:
+          type: string
+          description: The metric used to compute distance in the input data
+          examples:
+            - "cosine"
+            - "hamming"
+            - "jaccard"
+        random_state:
+          type: integer
+          description: The random seed for UMAP's stochastic algorithm
+          examples:
+            - 12
+    ProcessingRunMetadata:
+      type: object
+      description: Metadata about how this consultation was processed
+      required:
+        - started_at
+        - completed_at
+        - topic_model
+        - llm
+      additionalProperties: false
+      properties:
+        started_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        topic_model:
+          type: object
+          description: Details of the topic model
+          oneOf:
+          - $ref: "#/components/schemas/BERTopic"
+          - $ref: "#/components/schemas/DummyTopicModel"
+        llm:
+          type: object
+          description: Details of the LLM
+          oneOf:
+          - $ref: "#/components/schemas/LLM"
 

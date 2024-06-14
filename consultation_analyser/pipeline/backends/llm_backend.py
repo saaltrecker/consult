@@ -9,3 +9,7 @@ class LLMBackend(ABC):
     @abstractmethod
     def summarise_theme(self, theme: models.Theme) -> ThemeSummary:
         pass
+
+    @abstractmethod
+    def metadata(self) -> dict:
+        pass

@@ -22,6 +22,12 @@ class LangchainLLMBackend(LLMBackend):
         )  # TODO - where does this encoding come from, how do we associate it with model
         self.max_tokens = 2000
 
+    def metadata(self):
+        return {
+            "llm": self.llm._llm_type,
+            "prompt": self.__get_prompt_template().template
+        }
+
     def summarise_theme(self, theme: models.Theme) -> ThemeSummary:
         prompt_template = self.__get_prompt_template()
 

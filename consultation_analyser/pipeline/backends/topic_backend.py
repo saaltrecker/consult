@@ -9,3 +9,7 @@ class TopicBackend(ABC):
     @abstractmethod
     def get_topics(self, question: models.Question) -> list[TopicAssignment]:
         pass
+
+    @abstractmethod
+    def metadata(self) -> dict:
+        pass
