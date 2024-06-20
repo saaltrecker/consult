@@ -13,6 +13,8 @@ from .types import NO_SUMMARY_STR, ThemeSummary
 
 logger = logging.getLogger("pipeline")
 
+# set_debug(True)
+
 
 class LangchainLLMBackend(LLMBackend):
     def __init__(self, llm: LLM):
@@ -55,6 +57,8 @@ class LangchainLLMBackend(LLMBackend):
             logger.info(f"Failed to summarise theme with keywords: {theme.topic_keywords}.")
             error_message = e.args[0] if e.args else ""
             logger.info(error_message)
+            if type(e) == OutputParserException:
+                logger.info(f"LLM output: {e.llm_output}")
             return ThemeSummary(
                 **{
                     "short_description": NO_SUMMARY_STR,
