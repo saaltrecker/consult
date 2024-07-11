@@ -150,28 +150,28 @@ class ScatterChart extends HTMLElement {
         window.addEventListener('resize', sizeChart);
 
         const data = [
-            [10.0, 8.04, "Test item"],
-            [8.07, 6.95],
-            [13.0, 7.58],
-            [9.05, 8.81],
-            [11.0, 8.33],
-            [14.0, 7.66],
-            [13.4, 6.81],
-            [10.0, 6.33],
-            [14.0, 8.96],
-            [12.5, 6.82],
-            [9.15, 7.2],
-            [11.5, 7.2],
-            [3.03, 4.23],
-            [12.2, 7.83],
-            [2.02, 4.47],
-            [1.05, 3.33],
-            [4.05, 4.96],
-            [6.03, 7.24],
-            [12.0, 6.26],
-            [12.0, 8.84],
-            [7.08, 5.82],
-            [5.02, 5.68]
+            [10.0, 8.04, -1, "Test item"],
+            [8.07, 6.95, -1, "Test item"],
+            [13.0, 7.58, 0, "Test item"],
+            [9.05, 8.81, 0, "Test item"],
+            [11.0, 8.33, 0, "Test item"],
+            [14.0, 7.66, 0, "Test item"],
+            [13.4, 6.81, 0, "Test item"],
+            [10.0, 6.33, 0, "Test item"],
+            [14.0, 8.96, 1, "Test item"],
+            [12.5, 6.82, 1, "Test item"],
+            [9.15, 7.2, 1, "Test item"],
+            [11.5, 7.2, 1, "Test item"],
+            [3.03, 4.23, 2, "Test item"],
+            [12.2, 7.83, 2, "Test item"],
+            [2.02, 4.47, 2, "Test item"],
+            [1.05, 3.33, 3, "Test item"],
+            [4.05, 4.96, 3, "Test item"],
+            [6.03, 7.24, 3, "Test item"],
+            [12.0, 6.26, 3, "Test item"],
+            [12.0, 8.84, 4, "Test item"],
+            [7.08, 5.82, 4, "Test item"],
+            [5.02, 5.68, 4, "Test item"]
         ];
 
         const options = {
@@ -182,8 +182,9 @@ class ScatterChart extends HTMLElement {
                 symbolSize: 10, // size of the dots
                 data: data,
                 type: 'scatter',
-                itemStyle: {
-                    color: '#C50878'
+                encode: {
+                    tooltip: [0, 1, 2],
+                    itemName: 2 // Use Topic ID as item name
                 }
               }
             ],
@@ -193,9 +194,18 @@ class ScatterChart extends HTMLElement {
                     return `
                         X: ${params.value[0]}<br/>
                         Y: ${params.value[1]}<br/>
-                        Info: ${params.value[2]}<br/>
+                        Topic ID: ${params.value[2]}</br/>
+                        Info: ${params.value[3]}<br/>
                         Anything you like can be shown here
                     `;
+                }
+            },
+            visualMap: {
+                show: false,
+                dimension: 2,
+                categories: [-1, 0, 1, 2, 3, 4],
+                inRange: {
+                    color: ['#60697b', '#C50878', '#0B8478', '#924FB2', '#124581', '#0879C4']
                 }
             },
           };
