@@ -137,9 +137,11 @@ class ScatterChart extends HTMLElement {
          * Size the chart and chart container
          */
         const sizeChart = () => {
+            this.style.display = 'none';
             const parentWidth = this.parentElement?.scrollWidth || 1;
             this.style.width = `${parentWidth}px`;
             this.style.height = `${parentWidth * 0.5}px`;
+            this.style.display = 'block';
             const box = this.getBoundingClientRect();
             chart.resize({
                 height: box.height,
@@ -208,6 +210,12 @@ class ScatterChart extends HTMLElement {
                     color: ['#60697b', '#C50878', '#0B8478', '#924FB2', '#124581', '#0879C4']
                 }
             },
+            grid: {
+                left: '20px',
+                right: '20px',
+                top: '10px',
+                bottom: '20px'
+            }
           };
           chart.setOption(options);
 
