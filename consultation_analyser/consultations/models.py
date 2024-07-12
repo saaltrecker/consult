@@ -301,12 +301,16 @@ class Answer(UUIDPrimaryKeyModel, TimeStampedModel):
         topic_id: int,
         processing_run: ProcessingRun,
         topic_model_metadata: TopicModelMetadata,
+        summary, 
+        short_desc, 
     ):
         theme, _ = Theme.objects.get_or_create(
             topic_keywords=topic_keywords,
             topic_id=topic_id,
             processing_run=processing_run,
             topic_model_metadata=topic_model_metadata,
+            summary,
+            short_description
         )
         self.themes.add(theme)
         self.save()
