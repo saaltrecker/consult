@@ -175,6 +175,15 @@ class Question(UUIDPrimaryKeyModel, TimeStampedModel):
             models.UniqueConstraint(fields=["slug", "section"], name="unique_question_section"),
         ]
 
+class ConsultationFile(UUIDPrimaryKeyModel, TimeStampedModel):
+    consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(editable=False, null=False)
+    file_path = models.CharField(editable=False, null=False)
+
+    class Meta(UUIDPrimaryKeyModel.Meta, TimeStampedModel.Meta):
+        pass
+
+
 
 class ConsultationResponse(UUIDPrimaryKeyModel, TimeStampedModel):
     consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
@@ -185,7 +194,7 @@ class ConsultationResponse(UUIDPrimaryKeyModel, TimeStampedModel):
 
 
 class ProcessingRun(UUIDPrimaryKeyModel, TimeStampedModel):
-    consultation = models.ForeignKey(Consultation, on_delete=models.CASCADE)
+    consultation = models.ForeignKey(ConsultationFile, on_delete=models.CASCADE)
     # TODO - add more processing run metadata
 
     @property
