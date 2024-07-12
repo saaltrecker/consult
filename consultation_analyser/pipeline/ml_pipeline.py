@@ -4,6 +4,7 @@ from consultation_analyser.consultations import models
 
 from .backends.topic_backend import TopicBackend
 from .backends.types import TopicAssignment
+from .processing import summarise_with_llm
 
 logger = logging.getLogger("pipeline")
 
@@ -34,18 +35,20 @@ def save_themes_for_question(
     logging.info(f"Get topics for question: {question.text}")
     assignments = topic_backend.get_topics(question)
 
-    # Get LLM summary for theme 
+    # Get LLM summary for theme (needs consultation)
+    # Unfortunately this doesn't return the labels which we need here! 
     summarise_with_llm(consultation, processing_run, llm_backend)
     
     
-    # Merge similiar themes 
-
+    # Merge similiar themes (Michael's code)
+    
 
     data = get_scatter_plot_data(assignments)
     topic_model_metadata = models.TopicModelMetadata(scatter_plot_data=data)
     topic_model_metadata.save()
 
     for assignment in assignments:
+        # This needs to be updated with the labels too 
         assignment.answer.save_theme_to_answer(
             topic_keywords=assignment.topic_keywords,
             topic_id=assignment.topic_id,

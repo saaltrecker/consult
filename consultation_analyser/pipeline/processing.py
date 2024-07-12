@@ -84,6 +84,8 @@ def process_consultation_themes(consultation, topic_backend=None, llm_backend=No
         topic_backend = get_topic_backend()
 
     save_themes_for_processing_run(topic_backend, processing_run, llm_backend)
+    
+    # We now do this at an earlier stage 
     # summarise_with_llm(consultation, processing_run, llm_backend)
 
     return processing_run
