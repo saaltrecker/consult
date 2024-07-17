@@ -4,6 +4,29 @@ from django.http import HttpRequest
 from .. import models
 
 
+class ThemeFilter:
+    def __init__(self, question: models.Question):
+        self.question = question
+        self.filters = {}
+
+    def add_filter(self, filter_name, filter_value):
+        self.filters[filter_name] = filter_value
+
+    def apply_filters(self, themeset):
+        return themeset
+
+class AnswerFilter:
+    def __init__(self, question: models.Question):
+        self.question = question
+        self.filters = {}
+
+    def add_filter(self, filter_name, filter_value):
+        self.filters[filter_name] = filter_value
+
+    def apply_filters(self, themeset):
+        return themeset
+
+
 def get_applied_filters(request: HttpRequest) -> dict[str, str]:
     return {
         "keyword": request.GET.get("keyword", ""),
