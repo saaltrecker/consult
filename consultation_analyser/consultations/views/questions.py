@@ -2,14 +2,14 @@ from typing import Dict, List, Optional, Tuple
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Max, QuerySet
+from django.db.models import Max, QuerySet
 from django.http import Http404, HttpRequest
 from django.shortcuts import get_object_or_404, render
 
 from .. import models
 from .consultations import NO_THEMES_YET_MESSAGE
 from .decorators import user_can_see_consultation
-from .filters import get_applied_filters, get_filtered_responses, get_filtered_themes
+from .filters import ThemeFilter, get_filter_params
 
 
 def filter_scatter_plot_data(filtered_themes: QuerySet) -> List[Dict]:
@@ -63,26 +63,26 @@ def show(
         section__consultation__slug=consultation_slug,
     )
 
+    # this will never run bc processingrun has already 404'd
     if not processing_run:
         messages.info(request, NO_THEMES_YET_MESSAGE)
 
-    applied_filters = get_applied_filters(request)
-    responses = get_filtered_responses(question, applied_filters)
-    filtered_themes = (
-        get_filtered_themes(question, applied_filters, processing_run=processing_run)
-        .annotate(answer_count=Count("answer"))
-        .order_by("-answer_count")
-    )  # Gets latest themes only
+    # TODO - for now default to latest processing run
+    filter_params = get_filter_params(request)
 
-    if filtered_themes:
-        scatter_plot_data = filter_scatter_plot_data(filtered_themes)
+    theme_filter = ThemeFilter(id=filter_params.theme)
+    themes = theme_filter.apply(processing_run.themes)
+    answers = models.Answer.objects.filter(themes__in=themes)
+
+    if themes:
+        scatter_plot_data = filter_scatter_plot_data(themes)
     else:
         scatter_plot_data = []
 
     # Get counts
-    total_responses = responses.count()
+    total_responses = answers.count()
     multiple_choice_stats = question.multiple_choice_stats()
-    highest_theme_count = filtered_themes.aggregate(Max("answer_count"))["answer_count__max"]
+    highest_theme_count = themes.aggregate(Max("answer_count"))["answer_count__max"]
 
     blank_free_text_count = (
         models.Answer.objects.filter(question=question).filter(free_text="").count()
@@ -97,11 +97,11 @@ def show(
         "consultation_name": consultation.name,
         "question": question,
         "multiple_choice_stats": multiple_choice_stats,
-        "responses": responses,
-        "themes": filtered_themes,
+        "responses": answers,
+        "themes": themes,
         "highest_theme_count": highest_theme_count,
         "total_responses": total_responses,
-        "applied_filters": applied_filters,
+        "applied_filters": filter_params,
         "blank_free_text_count": blank_free_text_count,
         "outliers_count": outliers_count,
         "outlier_theme_id": outlier_theme.id if outlier_theme else None,

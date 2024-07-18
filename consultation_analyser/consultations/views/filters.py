@@ -1,61 +1,43 @@
-from django.db.models import Count, QuerySet
+from dataclasses import dataclass
+from typing import Optional
+
+from django.db.models import Count
 from django.http import HttpRequest
 
-from .. import models
+
+@dataclass
+class FilterParams:
+    theme: str
+    keyword: str
+
+
+def get_filter_params(request: HttpRequest) -> FilterParams:
+    return FilterParams(
+        theme=request.GET.get("theme"),
+        keyword=request.GET.get("keyword"),
+    )
 
 
 class ThemeFilter:
-    def __init__(self, question: models.Question):
-        self.question = question
-        self.filters = {}
+    def __init__(self, id: Optional[str] = None):
+        self.id = id
 
-    def add_filter(self, filter_name, filter_value):
-        self.filters[filter_name] = filter_value
+    def apply(self, themeset):
+        # TODO: move this unrelated code
+        themeset = themeset.annotate(answer_count=Count("answer")).order_by("-answer_count")
 
-    def apply_filters(self, themeset):
+        if self.id:
+            themeset = themeset.filter(id=self.id)
+
         return themeset
+
 
 class AnswerFilter:
-    def __init__(self, question: models.Question):
-        self.question = question
-        self.filters = {}
+    def __init__(self, keyword: Optional[str] = None):
+        self.keyword = keyword
 
-    def add_filter(self, filter_name, filter_value):
-        self.filters[filter_name] = filter_value
+    def apply(self, answerset):
+        if self.keyword:
+            answerset = answerset.filter(free_text__contains=self.keyword)
 
-    def apply_filters(self, themeset):
-        return themeset
-
-
-def get_applied_filters(request: HttpRequest) -> dict[str, str]:
-    return {
-        "keyword": request.GET.get("keyword", ""),
-        "theme": request.GET.get("theme", "All"),
-    }
-
-
-# TODO: rename this to Answers
-def get_filtered_responses(question: models.Question, applied_filters: dict[str, str]) -> QuerySet:
-    queryset = models.Answer.objects.filter(question=question)
-    if (
-        applied_filters["keyword"]
-        and applied_filters["keyword"] != "All"
-        and applied_filters["keyword"] != ""
-    ):
-        queryset = queryset.filter(free_text__contains=applied_filters["keyword"])
-    if applied_filters["theme"] != "All":
-        queryset = queryset.filter(themes=applied_filters["theme"])
-    return queryset
-
-
-def get_filtered_themes(
-    question: models.Question, applied_filters: dict[str, str], processing_run: models.ProcessingRun
-) -> QuerySet:
-    if processing_run:
-        queryset = processing_run.get_themes_for_question(question_id=question.id)
-    else:
-        queryset = models.Theme.objects.none()
-    queryset = queryset.annotate(answer_count=Count("answer"))
-    if applied_filters["theme"] != "All":
-        queryset = queryset.filter(id=applied_filters["theme"])
-    return queryset
+        return answerset

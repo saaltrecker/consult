@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-import pytest
 from urllib.parse import urlencode
 
-from consultation_analyser.factories import ConsultationBuilder, UserFactory
-from consultation_analyser.consultations import models
+import pytest
+
 from consultation_analyser.authentication.models import User
+from consultation_analyser.consultations import models
+from consultation_analyser.factories import ConsultationBuilder, UserFactory
+
+from tests.helpers import save_and_open_page
 
 
 @dataclass
@@ -53,16 +56,19 @@ def test_filter_by_theme(client, question_for_filtering):
     page = str(client.get(question_for_filtering.question_url).content)
 
     # No filters applied
-    assert "bunny theme" in page
-    assert "kitten theme" in page
+    assert "bunny theme</span>" in page
+    assert "kitten theme</span>" in page
 
     # Filter by theme 1
     filter_theme1 = urlencode({"theme": question_for_filtering.theme1.id})
 
     page = str(client.get(f"{question_for_filtering.question_url}?{filter_theme1}").content)
 
-    assert "bunny theme" in page
-    assert "kitten theme" not in page
+    assert "bunny theme</option>" in page
+    assert "kitten theme</option>" in page
+
+    assert "bunny theme</span>" in page
+    assert "kitten theme</span>" not in page
 
 
 @pytest.mark.django_db
@@ -71,22 +77,24 @@ def test_filter_responses_by_keyword(client, question_for_filtering):
 
     page = str(client.get(question_for_filtering.responses_url).content)
 
-    assert "I love bunnies" in page
-    assert "I love kittens" in page
+    save_and_open_page(client.get(question_for_filtering.responses_url).content)
+
+    assert "I love bunnies</td>" in page
+    assert "I love kittens</td>" in page
 
     filter = urlencode({"keyword": "bunnies"})
 
     page = str(client.get(f"{question_for_filtering.responses_url}?{filter}").content)
 
-    assert "I love bunnies" in page
-    assert "I love kittens" not in page
+    assert "I love bunnies</td>" in page
+    assert "I love kittens</td>" not in page
 
     filter = urlencode({"keyword": "micropigs"})
 
     page = str(client.get(f"{question_for_filtering.responses_url}?{filter}").content)
 
-    assert "I love bunnies" not in page
-    assert "I love kittens" not in page
+    assert "I love bunnies</td>" not in page
+    assert "I love kittens</td>" not in page
 
 
 @pytest.mark.django_db
@@ -97,5 +105,8 @@ def test_filter_responses_by_theme(client, question_for_filtering):
 
     page = str(client.get(f"{question_for_filtering.responses_url}?{filter_theme1}").content)
 
-    assert "I love bunnies" in page
-    assert "I love kittens" not in page
+    assert "bunny theme</option>" in page
+    assert "kitten theme</option>" in page
+
+    assert "I love bunnies</td>" in page
+    assert "I love kittens</td>" not in page
