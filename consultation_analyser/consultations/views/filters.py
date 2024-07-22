@@ -1,3 +1,4 @@
+from urllib.parse import urlencode
 from dataclasses import dataclass
 from typing import Optional
 
@@ -9,6 +10,14 @@ from django.http import HttpRequest
 class FilterParams:
     theme: str
     keyword: str
+
+    def as_querystring(self):
+        qvs = {
+            "theme": self.theme,
+            "keyword": self.keyword,
+        }
+
+        return urlencode(qvs, doseq=True)
 
 
 def get_filter_params(request: HttpRequest) -> FilterParams:

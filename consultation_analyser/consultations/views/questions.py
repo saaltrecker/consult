@@ -63,33 +63,38 @@ def show(
         section__consultation__slug=consultation_slug,
     )
 
-    # this will never run bc processingrun has already 404'd
-    if not processing_run:
-        messages.info(request, NO_THEMES_YET_MESSAGE)
-
-    # TODO - for now default to latest processing run
     filter_params = get_filter_params(request)
+    consultation = question.section.consultation
+    processing_run = consultation.latest_processing_run
 
-    theme_filter = ThemeFilter(id=filter_params.theme)
-    themes = theme_filter.apply(processing_run.themes)
-    answers = models.Answer.objects.filter(themes__in=themes)
-
-    if themes:
-        scatter_plot_data = filter_scatter_plot_data(themes)
-    else:
+    if not processing_run:
+        themes = models.Theme.objects.none()
         scatter_plot_data = []
+        highest_theme_count = None
+        outliers_count = None
+        outlier_theme = None
+
+        messages.info(request, NO_THEMES_YET_MESSAGE)
+    else:
+        theme_filter = ThemeFilter(id=filter_params.theme)
+        themes = theme_filter.apply(processing_run.themes)
+
+        scatter_plot_data = filter_scatter_plot_data(themes)
+
+        highest_theme_count = themes.aggregate(Max("answer_count"))["answer_count__max"]
+
+        outlier_theme, outliers_count = get_outliers_info(
+            processing_run=processing_run, question=question
+        )
+
+    answers = models.Answer.objects.filter(themes__in=themes)
 
     # Get counts
     total_responses = answers.count()
     multiple_choice_stats = question.multiple_choice_stats()
-    highest_theme_count = themes.aggregate(Max("answer_count"))["answer_count__max"]
 
     blank_free_text_count = (
         models.Answer.objects.filter(question=question).filter(free_text="").count()
-    )
-
-    outlier_theme, outliers_count = get_outliers_info(
-        processing_run=processing_run, question=question
     )
 
     context = {
@@ -99,6 +104,7 @@ def show(
         "multiple_choice_stats": multiple_choice_stats,
         "responses": answers,
         "themes": themes,
+        "all_themes": processing_run.themes if processing_run else [],
         "highest_theme_count": highest_theme_count,
         "total_responses": total_responses,
         "applied_filters": filter_params,

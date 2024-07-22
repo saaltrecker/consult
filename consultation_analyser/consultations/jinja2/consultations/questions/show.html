@@ -49,7 +49,7 @@
                   </label>
                   <select class="govuk-select" id="theme" name="theme">
                     <option value="" {% if applied_filters.theme == "All" %}selected{% endif %}>All</option>
-                    {% for theme in themes %}
+                    {% for theme in all_themes %}
                       <option value="{{ theme.id }}" {% if applied_filters.theme|string == theme.id|string %}selected{% endif %}>{{ theme.short_description }}</option>
                     {% endfor %}
                     {#<option {% if applied_filters.theme == "No theme" %}selected{% endif %}>No theme</option>#}

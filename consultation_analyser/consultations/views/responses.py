@@ -65,6 +65,7 @@ def index(
         "total_responses": total_answers,
         "applied_filters": filter_params,
         "themes": themes,
+        "all_themes": processing_run.themes,
         "pagination": current_page,
     }
 

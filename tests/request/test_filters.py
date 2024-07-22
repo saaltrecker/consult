@@ -7,8 +7,6 @@ from consultation_analyser.authentication.models import User
 from consultation_analyser.consultations import models
 from consultation_analyser.factories import ConsultationBuilder, UserFactory
 
-from tests.helpers import save_and_open_page
-
 
 @dataclass
 class QuestionForFiltering:
@@ -76,8 +74,6 @@ def test_filter_responses_by_keyword(client, question_for_filtering):
     client.force_login(question_for_filtering.user)
 
     page = str(client.get(question_for_filtering.responses_url).content)
-
-    save_and_open_page(client.get(question_for_filtering.responses_url).content)
 
     assert "I love bunnies</td>" in page
     assert "I love kittens</td>" in page

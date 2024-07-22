@@ -49,14 +49,14 @@
               Theme
             </label>
             <select class="govuk-select" id="theme" name="theme">
-              <option {% if applied_filters.theme == "All" %}selected{% endif %}>All</option>
-              {% for theme in themes %}
+              <option value="" {% if applied_filters.theme == "All" %}selected{% endif %}>All</option>
+              {% for theme in all_themes %}
                 <option value="{{ theme.id }}" {% if applied_filters.theme|string == theme.id|string %}selected{% endif %}>{{ theme.short_description }}</option>
               {% endfor %}
               {#<option {% if applied_filters.theme == "No theme" %}selected{% endif %}>No theme</option>#}
             </select>
           </div>
-         
+
             {{ govukButton({
               "text": "Apply filters",
               "classes": "govuk-!-margin-bottom-2"
@@ -94,9 +94,7 @@
                     {% endfor %}
                   </td>
                 {% endif %}
-                <td class="govuk-table__cell">
-                  {{ response.free_text }}
-                </td>
+                <td class="govuk-table__cell">{{ response.free_text }}</td>
               </tr>
             {% endfor %}
           </tbody>
@@ -107,9 +105,7 @@
           <nav class="govuk-pagination" role="navigation" aria-label="Pagination">
 
             {% set filters = namespace(str="") %}
-            {% for key, value in applied_filters.items() %}
-              {% set filters.str = filters.str + "&" + key + "=" + value %}
-            {% endfor %}
+            {% set filters.str = applied_filters.as_querystring() %}
 
             {% if pagination.number > 1 %}
               <div class="govuk-pagination__prev">
