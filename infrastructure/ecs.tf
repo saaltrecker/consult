@@ -34,7 +34,7 @@ locals {
 module "ecs" {
   # checkov:skip=CKV_TF_1: We're using semantic versions instead of commit hash
   #source            = "../../i-dot-ai-core-terraform-modules//modules/infrastructure/ecs" # For testing local changes
-  source             = "git::https://github.com/i-dot-ai/i-dot-ai-core-terraform-modules.git//modules/infrastructure/ecs?ref=v1.0.0-ecs"
+  source             = "git::https://github.com/i-dot-ai/i-dot-ai-core-terraform-modules.git//modules/infrastructure/ecs?ref=v3.1.1-ecs"
   name               = local.name
   image_tag          = var.image_tag
   ecr_repository_uri = var.ecr_repository_uri
@@ -42,6 +42,8 @@ module "ecs" {
   ecs_cluster_name   = data.terraform_remote_state.platform.outputs.ecs_cluster_name
   memory             = local.ecs_memory
   cpu                = local.ecs_cpus
+  certificate_arn    = data.terraform_remote_state.universal.outputs.certificate_arn
+
   health_check = {
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -52,7 +54,6 @@ module "ecs" {
   }
   environment_variables = local.ecs_env_vars
 
-  state_bucket                 = var.state_bucket
   vpc_id                       = data.terraform_remote_state.vpc.outputs.vpc_id
   private_subnets              = data.terraform_remote_state.vpc.outputs.private_subnets
   container_port               = "8000"
@@ -72,7 +73,7 @@ module "ecs" {
 module "worker" {
   # checkov:skip=CKV_TF_1: We're using semantic versions instead of commit hash
   #source            = "../../i-dot-ai-core-terraform-modules//modules/infrastructure/ecs" # For testing local changes
-  source             = "git::https://github.com/i-dot-ai/i-dot-ai-core-terraform-modules.git//modules/infrastructure/ecs?ref=v1.0.0-ecs"
+  source             = "git::https://github.com/i-dot-ai/i-dot-ai-core-terraform-modules.git//modules/infrastructure/ecs?ref=v3.1.1-ecs"
   name               = "${local.name}-worker"
   image_tag          = var.image_tag
   ecr_repository_uri = var.ecr_repository_uri
@@ -80,6 +81,8 @@ module "worker" {
   ecs_cluster_name   = data.terraform_remote_state.platform.outputs.ecs_cluster_name
   memory             = local.ecs_memory
   cpu                = local.ecs_cpus
+  certificate_arn    = data.terraform_remote_state.universal.outputs.certificate_arn
+
   health_check = {
     healthy_threshold   = 3
     unhealthy_threshold = 3
@@ -90,7 +93,6 @@ module "worker" {
   }
   environment_variables = local.ecs_env_vars
 
-  state_bucket                 = var.state_bucket
   vpc_id                       = data.terraform_remote_state.vpc.outputs.vpc_id
   private_subnets              = data.terraform_remote_state.vpc.outputs.private_subnets
   container_port               = "8000"
