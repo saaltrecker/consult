@@ -1,8 +1,8 @@
-from typing import Dict, List, Optional, Tuple
+from typing import Optional, Tuple
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count, Max, QuerySet
+from django.db.models import Count, Max
 from django.http import Http404, HttpRequest
 from django.shortcuts import get_object_or_404, render
 
@@ -10,7 +10,6 @@ from .. import models
 from .consultations import NO_THEMES_YET_MESSAGE
 from .decorators import user_can_see_consultation
 from .filters import get_applied_filters, get_filtered_responses, get_filtered_themes
-
 
 
 def get_outliers_info(processing_run: models.ProcessingRun, question: models.Question) -> Tuple:

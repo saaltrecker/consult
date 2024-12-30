@@ -248,7 +248,6 @@ class Theme(UUIDPrimaryKeyModel, TimeStampedModel):
         pass
 
 
-
 class AnswerQuerySet(models.QuerySet):
     MULTIPLE_CHOICE_QUERY = """
         EXISTS (
