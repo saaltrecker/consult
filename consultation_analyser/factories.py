@@ -230,17 +230,11 @@ class ProcessingRunFactory(factory.django.DjangoModelFactory):
         model = models.ProcessingRun
 
 
-class TopicModelMetadataFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.TopicModelMetadata
-
-
 class ThemeFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Theme
 
     processing_run = factory.SubFactory(ProcessingRunFactory)
-    topic_model_metadata = factory.SubFactory(TopicModelMetadataFactory)
     topic_keywords = factory.LazyAttribute(lambda _o: generate_dummy_topic_keywords())
     short_description = factory.LazyAttribute(lambda _o: faker.sentence())
     summary = factory.LazyAttribute(lambda _o: faker.sentence())

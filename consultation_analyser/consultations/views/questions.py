@@ -12,21 +12,6 @@ from .decorators import user_can_see_consultation
 from .filters import get_applied_filters, get_filtered_responses, get_filtered_themes
 
 
-def filter_scatter_plot_data(filtered_themes: QuerySet) -> List[Dict]:
-    if not filtered_themes:
-        return []
-    theme = filtered_themes.first()  # metadata same for all themes for question
-    topic_model_metadata = theme.topic_model_metadata
-    data = topic_model_metadata.scatter_plot_data
-    if not data:  # Old consultations - didn't calculate scatter data when generating themes
-        return []
-    data = data["data"]
-    topic_ids = [theme.topic_id for theme in filtered_themes]
-    filtered_scatter_data = [
-        coordinate for coordinate in data if coordinate["topic_id"] in topic_ids
-    ]
-    return filtered_scatter_data
-
 
 def get_outliers_info(processing_run: models.ProcessingRun, question: models.Question) -> Tuple:
     outlier_theme = None
@@ -74,11 +59,6 @@ def show(
         .order_by("-answer_count")
     )  # Gets latest themes only
 
-    if filtered_themes:
-        scatter_plot_data = filter_scatter_plot_data(filtered_themes)
-    else:
-        scatter_plot_data = []
-
     # Get counts
     total_responses = responses.count()
     multiple_choice_stats = question.multiple_choice_stats()
@@ -105,7 +85,6 @@ def show(
         "blank_free_text_count": blank_free_text_count,
         "outliers_count": outliers_count,
         "outlier_theme_id": outlier_theme.id if outlier_theme else None,
-        "scatter_plot_data": scatter_plot_data,
         "processing_run": processing_run,
     }
     return render(request, "consultations/questions/show.html", context)
